@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="{{ site.LanguageCode | default site.Language.Lang  }}">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<title>{{ block "title" . }}{{ with .Params.Title }}{{ . }} | {{ end }}{{ .Site.Title }}{{ end }}</title>
+
+		<meta name="viewport" content="width=device-width,minimum-scale=1">
+		<meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{if .IsPage}}{{ .Summary }}{{ else }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ end }}{{ end }}">
+
+		{{ hugo.Generator }}
+
+		{{ $production := eq (getenv "HUGO_ENV") "production" | or (eq site.Params.env "production") }}
+		{{ $public := not .Params.private }}
+
+		{{ if and $production $public }}
+		<meta name="robots" content="index, follow">
+		{{ else }}
+		<meta name="robots" content="noindex, nofollow">
+		{{ end }}
+
+		{{ $bundleRaw := resources.Get "css/style.css" | resources.ExecuteAsTemplate "css/main.tmp.css" . }}
+
+		{{ if hugo.IsServer }}
+		{{ $cssOpts := (dict "targetPath" "css/main.css" "enableSourceMap" true ) }}
+		{{ $bundle := $bundleRaw | toCSS $cssOpts }}
+		<link rel="stylesheet" href="{{ $bundle.RelPermalink }}" media="screen">
+		{{ else }}
+		{{ $cssOpts := (dict "targetPath" "css/main.css" ) }}
+		{{ $postCSSOpts := (dict "use" "autoprefixer" ) }}
+		{{ $bundle := $bundleRaw | toCSS $cssOpts | postCSS $postCSSOpts | minify | fingerprint }}
+		<link rel="stylesheet" href="{{ $bundle.RelPermalink }}" integrity="{{ $bundle.Data.Integrity }}" crossorigin="anonymous" media="screen">
+		{{ end }}
+
+		<link rel="shortcut icon" href="{{ relURL ($.Site.Params.favicon) }}" type="image/x-icon" />
+
+		{{ with .OutputFormats.Get "rss" }}
+		  {{ printf `<link rel=%q type=%q href=%q title=%q>` .Rel .MediaType.Type .Permalink site.Title | safeHTML }}
+		{{ end }}
+
+		{{/* NOTE: These Hugo Internal Templates can be found starting at https://github.com/gohugoio/hugo/tree/master/tpl/tplimpl/embedded/templates */}}
+		{{- template "_internal/opengraph.html" . -}}
+		{{- template "_internal/schema.html" . -}}
+		{{- template "_internal/twitter_cards.html" . -}}
+
+		{{ if .Store.Get "hasMermaid" }}
+		  <script type="module">
+			import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+			mermaid.initialize({ startOnLoad: true });
+		  </script>
+		{{ end }}
+	</head>
+
+	<body>
+		<header>
+			<h1><a href="{{ .Site.Home.RelPermalink }}">{{ .Site.Title }}</a></h1>
+			{{ partial "site-navigation.html" .}}
+		</header>
+
+		<main role="main">
+			{{ block "main" . }}{{ end }}
+
+			<article>
+				<h2>About xconspirisist</h2>
+
+				<p>
+					<img class = "profile" src = "/jwrFs/Personal/Memories/Profile/xconspirisist-avatar-170.png" alt = "xconspirisist avatar" title = "xconspirisist" />
+
+					Gaming as xconspirisist (or just xcons). I've been playing since the mid-90s — from Super Mario 64 on the Nintendo 64 to Half-Life on PC, and plenty in between.
+				</p>
+			</article>
+		</main>
+
+		{{ if .Store.Get "hasMermaid" }}
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+{{ end }}
+
+		{{ block "footer" . }}{{ partialCached "site-footer.html" . }}{{ end }}
+	</body>
+</html>

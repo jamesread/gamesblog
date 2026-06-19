@@ -1,0 +1,10 @@
+baseURL: 'https://games.xconspirisist.co.uk/'
+languageCode: 'en-us'
+title: "xcons' Gaming Blog"
+theme: 'jwr'
+copyright: '2026'
+params:
+  env: production
+  mainSections:
+    - posts
+  usefeaturedimage: true

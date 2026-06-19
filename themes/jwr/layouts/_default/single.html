@@ -1,0 +1,43 @@
+{{ define "header" }}
+{{ .Store.Set "isSummary" false }}
+{{ partial "post-header.html" . }}
+{{ end }}
+
+{{ define "main" }}
+
+{{ $section := .Site.GetPage "section" .Section }}
+<article class = "default-single">
+{{ .Store.Set "isSummary" false }}
+	{{ partial "post-header.html" . }}
+
+	{{ if and .Params.UseFeaturedImages .Params.featured_image_credit }}
+	<aside class = "featuredImageCredit">
+		Featured image by <a href = "{{ .Params.featured_image_url }}">{{ .Params.featured_image_credit }}</a>
+	</aside>
+	{{ end }}
+	<div>
+		{{- .Content -}}
+	</div>
+
+	{{- partial "ai-disclosure.html" . -}}
+
+	<aside>
+		<h2>Tags</h2>
+		{{- partial "tags.html" . -}}
+		<br />
+	</aside>
+
+	{{- partial "menu-contextual.html" . -}}
+</article>
+
+<aside class = "currentPage">
+	You are viewing a single article. <a href = "/">Return to home</a>.
+</aside>
+
+{{ if .Params.Medium }}
+<aside>
+	<p>This article is also published on <a href = "{{ .Params.Medium }}">Medium.com</a>.</p>
+</aside>
+{{ end }}
+
+{{ end }}

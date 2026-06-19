@@ -1,0 +1,35 @@
+<header>
+	<h2>
+		<a href = "{{.RelPermalink}}">{{- .Title -}}</a>
+	</h2>
+
+	<aside>
+		<time>
+			{{- .Date | time.Format (default "Jan 2, 2006" .Site.Params.date_format) -}}
+		</time>, 
+		{{  .ReadingTime }} min read 
+		(~{{ .FuzzyWordCount }} words)
+	</aside>
+
+</header>
+
+{{ $featured_image := partial "func/GetFeaturedImage.html" . }}
+{{ if eq .Site.Params.usefeaturedimage true }}
+<div class = "cover-image">
+	<a href = "{{.RelPermalink}}">
+		<img src="{{ $featured_image }}" class = "featured" title = "{{ .Params.featured_image_caption | default "Sorry, this image does not have a title." }}" />
+	</a>
+
+	{{ if (.Store.Get "isSummary") }}
+	{{ else }}
+		{{ if .Params.featured_image_credit }}
+		<aside class = "featuredImageCredit">
+			Cover image by <a href = "{{ .Params.featured_image_url }}">{{ .Params.featured_image_credit }}</a>.
+		</aside>
+		{{ end }}
+	{{ end }}
+	
+</div>
+{{ end }}
+
+
